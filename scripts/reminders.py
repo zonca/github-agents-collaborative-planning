@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 import sys
-from datetime import date, timedelta
+from datetime import date
 
 
 def run(args, parse=True):
@@ -29,13 +29,26 @@ def marker_for(due_date):
     return f"<!-- overdue-reminder:{due_date} -->"
 
 
-def find_project(owner, title):
-    raw = run(["gh", "project", "list", "--owner", owner, "--limit", "100", "--format", "json"])
-    projects = raw.get("projects", []) if isinstance(raw, dict) else raw
-    for project in projects:
-        if project.get("title") == title:
-            return project
-    return None
+def find_project(owner, number):
+    query = f"""
+query {{
+  user(login: "{owner}") {{
+    projectV2(number: {number}) {{ id title }}
+  }}
+}}
+"""
+    data = gql(query)
+    project = data.get("user", {}).get("projectV2")
+    if project is not None:
+        return project
+    query = f"""
+query {{
+  organization(login: "{owner}") {{
+    projectV2(number: {number}) {{ id title }}
+  }}
+}}
+"""
+    return gql(query).get("organization", {}).get("projectV2")
 
 
 def issue_page(repo, number):
@@ -76,13 +89,13 @@ def move_status(project_id, item_id, field_id, option_id):
 def main():
     repo = os.environ["GH_REPO"]
     owner = os.environ.get("PROJECT_OWNER") or repo.split("/", 1)[0]
-    title = os.environ.get("PROJECT_TITLE", "Collaborative Planning")
+    number = int(os.environ.get("PROJECT_NUMBER", ""))
     default_assignee = os.environ.get("DEFAULT_ASSIGNEE", "zonca")
     overdue_days = int(os.environ.get("OVERDUE_DAYS", "7"))
 
-    project = find_project(owner, title)
+    project = find_project(owner, number)
     if project is None:
-        print(f"Project '{title}' not found for owner {owner}", file=sys.stderr)
+        print(f"Project #{number} not found for owner {owner}", file=sys.stderr)
         sys.exit(1)
     project_id = project["id"]
 
@@ -134,7 +147,6 @@ query {{
     data = gql(query)
     project_node = data["node"]
     status_field = project_node.get("statusField") or {}
-    due_field = project_node.get("dueDateField") or {}
     options = {opt["name"]: opt["id"] for opt in status_field.get("options", [])}
     working_option = options.get("Working")
     status_field_id = status_field.get("id")
