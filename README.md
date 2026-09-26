@@ -51,4 +51,9 @@ When work tracked in an issue is finalized, the agent must propose promoting the
 
 ## License
 
-This template is provided for anyone to use as a starting point for their own collaborative planning repositories.
+This template is released under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE) license.
+
+You are free to share and adapt this template, provided you attribute the original work. If you use this template for your own project, or if it inspires your work, please link back to it:
+
+- GitHub: <https://github.com/zonca/github-agents-collaborative-planning>
+- Blog post: link to be added — tracked in [issue #1](https://github.com/zonca/github-agents-collaborative-planning/issues/1).
