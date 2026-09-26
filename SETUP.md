@@ -2,7 +2,7 @@
 
 This guide is for an **agent** helping a human set up this repository. The agent should perform every step it can on its own and only stop when user input is genuinely required.
 
-The user must have the GitHub CLI (`gh`) installed and authenticated (`gh auth status`) with a token that has at least the `project`, `repo`, and `workflow` scopes.
+The user must have the GitHub CLI (`gh`) installed and authenticated (`gh auth status`) with a token that has at least the `project`, `repo`, and `workflow` scopes (`gh auth refresh -h github.com -s project,read:project`).
 
 ---
 
@@ -35,19 +35,32 @@ Capture from the output:
 
 ### 2a. Status field
 
-Create a single-select field named `Status` with exactly these options, in this order:
+GitHub Projects ships with a built-in `Status` field (options `Todo / In Progress / Done`) that **cannot be deleted** and cannot be edited through the `gh` CLI. Set exactly our four options with the GraphQL API instead:
 
 ```bash
-gh project field-create <number> --owner <owner> \
-  --name "Status" \
-  --data-type SINGLE_SELECT \
-  --single-select-options "ToDo,Working,Snoozed,Done"
+gh api graphql --input - <<'EOF'
+{
+  "query": "mutation($fieldId: ID!, $options: [ProjectV2SingleSelectFieldOptionInput!]!){ updateProjectV2Field(input: {fieldId: $fieldId, name: \"Status\", singleSelectOptions: $options}){ projectV2Field { ... on ProjectV2SingleSelectField { id name options { id name } } } } }",
+  "variables": {
+    "fieldId": "<STATUS_FIELD_ID>",
+    "options": [
+      {"name": "ToDo", "color": "GRAY", "description": ""},
+      {"name": "Working", "color": "GREEN", "description": ""},
+      {"name": "Snoozed", "color": "YELLOW", "description": ""},
+      {"name": "Done", "color": "PURPLE", "description": ""}
+    ]
+  }
+}
+EOF
 ```
 
-If a default `Status` field already exists (new projects ship with one), either:
+Find the Status field ID first with:
 
-- use the project UI to rename/clear options: project → Settings → `Status` field → edit the options to `ToDo`, `Working`, `Snoozed`, `Done`; or
-- delete the default field with `gh project field-delete <number> --owner <owner> --field-id <id>` (find the field ID with `gh project field-list <number> --owner <owner> --format json`), then create the field as above.
+```bash
+gh project field-list <number> --owner <owner> --format json --jq '.fields[] | select(.name=="Status") | .id'
+```
+
+Valid colors: `GRAY`, `BLUE`, `GREEN`, `YELLOW`, `ORANGE`, `RED`, `PINK`, `PURPLE`.
 
 ### 2b. Due date field
 
@@ -61,45 +74,36 @@ gh project field-create <number> --owner <owner> --name "Due date" --data-type D
 gh project link <number> --owner <owner> --repo <owner>/<repo>
 ```
 
-### 2d. Automation rule: new issue → ToDo
+### 2d. Automation rules (browser only)
 
-There is no CLI for project automation rules; configure it in the browser (the agent can open the project with `gh project view <number> --owner <owner> --web`):
+There is no CLI or API for project automation rules; configure them in the browser. Open the project with `gh project view <number> --owner <owner> --web`, then:
 
-1. Open the project.
-2. Go to the automation/workflow section (project settings → Automation, or the three-dots menu → Workflows).
-3. Create a workflow on **"Item added to project"** that sets `Status` to `ToDo`.
-
-Repeat the same rule for **"Issue reopened"**, if desired, so reopened issues return to `ToDo`.
+1. Click the **⋯** (top right) → **Workflows**.
+2. **Auto-add to project**: filter for the repository (`is:issue,is:open`) → *Save and turn on workflow*. This makes every new issue land in the project.
+3. **Item added to project**: set `Status: ToDo` → *Save and turn on workflow*.
+4. Optional: **Item reopened** → `Status: ToDo`.
 
 ---
 
-## 3. Create the fine-grained token
+## 3. Create the token for the workflow
 
-The reminder workflow needs a fine-grained personal access token because `GITHUB_TOKEN` cannot read or write GitHub Projects v2.
+The reminder workflow needs a **classic** personal access token.
 
-Open the token creation page and ask the user to create a token:
+> Why not a fine-grained PAT? Fine-grained tokens have a `Projects` permission only for **organization-owned** projects; user-owned projects (like this one, owned by `zonca`) cannot be accessed by fine-grained tokens. Fine-grained tokens also cannot use the GraphQL API, which the reminder script depends on.
 
-```bash
-gh project view <number> --owner <owner> --web
-```
+Ask the user to create a classic token at <https://github.com/settings/tokens/new> with:
 
-Then guide the user to <https://github.com/settings/personal-access-tokens/new> with these settings:
-
-- **Token name**: `github-agents-collaborative-planning`
+- **Note**: `github-agents-collaborative-planning`
 - **Expiration**: per user preference (90 days is a reasonable default)
-- **Repository access**: *Only select repositories* → this repository
-- **Permissions**:
-  - Metadata: **Read-only** (required)
-  - Issues: **Read and write**
-  - Projects: **Read and write**
+- **Scopes**: `repo` (carries Issues read/write) and `project` (Projects v2 read/write)
 
-Ask the user to paste the token (it is shown only once). Store it as a repository secret:
+Ask the user to paste the token (it is shown only once), then store it as a repository secret without printing it:
 
 ```bash
 gh secret set PROJECT_TOKEN
 ```
 
-`gh` prompts for the value securely; do not print the token to the terminal or store it anywhere else.
+`gh` prompts for the value securely; do not write the token to the terminal history or anywhere else.
 
 ---
 
@@ -116,12 +120,12 @@ The workflow `.github/workflows/reminders.yml` ships with this template. Its def
 
 Notes:
 
-- GitHub Actions cron schedules are in **UTC**, not local time. `0 15 * * *` equals 08:00 Pacific during daylight saving; use `0 16 * * *` for 08:00 during standard time. Pick the entry that suits the user's time of year, or keep `0 15` as a reasonable default.
+- GitHub Actions cron schedules are in **UTC**, not local time. `0 15 * * *` equals 08:00 Pacific during daylight saving; use `0 16 * * *` for 08:00 during standard time.
 - Scheduled workflows run only on the default branch and only if Actions are enabled for the repository. If the user created the repo from a fork, Actions may be disabled — enable them under *Settings → Actions → General*.
 
 ### Verify
 
-Trigger a manual test run:
+Trigger a manual test run (after the secret is set):
 
 ```bash
 gh workflow run reminders.yml --repo <owner>/<repo>
@@ -141,17 +145,21 @@ Each collaborator gets their own `user_agent/AGENTS_<github-username>.md` file. 
 ## Summary of commands
 
 ```bash
+gh auth refresh -h github.com -s project,read:project
+
 # Create project
 gh project create --owner <owner> --title "Collaborative Planning" --format json
 
-# Status + Due date fields
-gh project field-create <number> --owner <owner> --name "Status" --data-type SINGLE_SELECT --single-select-options "ToDo,Working,Snoozed,Done"
-gh project field-create <number> --owner <owner> --name "Due date" --data-type DATE
+# Status options (GraphQL, see section 2a)
+gh api graphql --input - <<'EOF'
+{ "query": "mutation($fieldId: ID!, $options: [ProjectV2SingleSelectFieldOptionInput!]!){ updateProjectV2Field(input: {fieldId: $fieldId, name: \"Status\", singleSelectOptions: $options}){ projectV2Field { ... on ProjectV2SingleSelectField { id } } } }", "variables": { "fieldId": "<STATUS_FIELD_ID>", "options": [{"name":"ToDo","color":"GRAY","description":""},{"name":"Working","color":"GREEN","description":""},{"name":"Snoozed","color":"YELLOW","description":""},{"name":"Done","color":"PURPLE","description":""}] } }
+EOF
 
-# Link repo
+# Due date field + link repo
+gh project field-create <number> --owner <owner> --name "Due date" --data-type DATE
 gh project link <number> --owner <owner> --repo <owner>/<repo>
 
-# Secret
+# Secret (classic PAT: repo + project scopes)
 gh secret set PROJECT_TOKEN
 
 # Test
