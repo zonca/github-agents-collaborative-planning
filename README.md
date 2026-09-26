@@ -45,6 +45,12 @@ This is not a tool for autonomous agents talking to each other. In this model, e
    - moves issues whose due date has arrived from `Snoozed` back to `ToDo`;
    - sends a single notification (one week after the due date is missed) mentioning the assignee — or the default fallback user `zonca` if no one is assigned.
 
+## Working with agents
+
+Each collaborator works with their own agent, which is connected to the whole repository. The agent reads the relevant documents and knows the current state of the project, so it can propose next steps in concrete form — but every action needs the human's approval.
+
+A typical session starts with **"check issues"**: the agent reviews the issues and pull requests in `ToDo`/`Working` state assigned to that collaborator, reads the related content in the repository, and proposes one concrete next action per issue — draft an email, write a document, schedule an event, and so on. The human picks, corrects, or redirects. Whatever is actually executed is recorded as an update on the issue, so the project history stays in the repository.
+
 ## Promotion procedure
 
 When work tracked in an issue is finalized, the agent must propose promoting the result into the repository: it suggests the most appropriate folder (see the structure table above) and writes the outcome — a decision record, meeting summary, plan update, and so on — as a Markdown document. The human approves the change through a pull request.
