@@ -10,7 +10,7 @@ This is not a tool for autonomous agents talking to each other. In this model, e
 - **Agents draft, humans decide.** Before performing any operation, an agent must show a concrete draft of what it intends to do and wait for explicit authorization.
 - **Issues are for discussions and tasks.** Use issues to discuss open questions and to track work over time. Every issue carries a `Due date`.
 - **Pull requests are for feedback.** Feedback on documents happens through pull requests, so all changes are reviewed and recorded.
-- **GitHub Projects manage deadlines.** A shared public project board tracks the lifecycle of every issue: `ToDo → Working → Snoozed → Done`.
+- **GitHub Projects manage deadlines and give the state at a glance.** A shared public project board tracks the lifecycle of every issue: `ToDo → Working → Snoozed → Done`. One glance shows what is in progress now (`Working`), what to pick next (`ToDo`), and what is parked until its `Due date` (`Snoozed`).
 - **GitHub Actions keep time.** A daily workflow (08:00 Pacific) moves snoozed issues back to `ToDo` when their due date arrives, and sends one notification a week after an issue is overdue.
 
 ## Repository structure
@@ -37,6 +37,8 @@ This is not a tool for autonomous agents talking to each other. In this model, e
 4. Start filling the top-level folders as the project evolves.
 
 ## The issue lifecycle
+
+Every activity is an issue, and the issue tracks its state over time — that is what makes it possible to organize a long, deadline-driven effort: what is being worked on now, what is next, what was postponed.
 
 1. A new issue is created and automatically lands in `ToDo` (project automation rule).
 2. An agent starts working on the issue: moves it to `Working`.
