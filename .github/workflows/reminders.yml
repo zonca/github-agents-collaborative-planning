@@ -1,0 +1,24 @@
+name: Reminders
+
+on:
+  schedule:
+    - cron: "0 15 * * *"
+  workflow_dispatch:
+
+env:
+  PROJECT_TITLE: Collaborative Planning
+
+jobs:
+  reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run deadline reminders
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PROJECT_TITLE: ${{ env.PROJECT_TITLE }}
+          PROJECT_OWNER: ${{ github.repository_owner }}
+          DEFAULT_ASSIGNEE: zonca
+          OVERDUE_DAYS: "7"
+        run: python3 scripts/reminders.py
