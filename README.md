@@ -64,4 +64,4 @@ This template is released under the [Creative Commons Attribution 4.0 Internatio
 You are free to share and adapt this template, provided you attribute the original work. If you use this template for your own project, or if it inspires your work, please link back to it:
 
 - GitHub: <https://github.com/zonca/github-agents-collaborative-planning>
-- Blog post: [Organizing events with GitHub and AI agents](https://github.com/zonca/zonca.dev/pull/129) (published once the PR is merged — tracked in [issue #1](https://github.com/zonca/github-agents-collaborative-planning/issues/1)).
+- Blog post: [Managing projects with GitHub and AI agents](https://zonca.dev/posts/2026-09-26-managing-projects-github-ai-agents).
