@@ -26,7 +26,7 @@ Agents assist their human collaborator. There are no autonomous agents here: eve
 
 ## Check-up procedure
 
-Whenever a collaborator asks for a "check issues" (or similar), the agent must:
+Whenever a collaborator asks for a "check issues" (or simply says "Go"), the agent must:
 
 1. Review all issues and pull requests in status `ToDo` or `Working` that are assigned to that collaborator.
 2. Read each issue in full, plus everything related in the repository (documents, folders, referenced content).
