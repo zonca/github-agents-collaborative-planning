@@ -73,7 +73,7 @@ def post_reminder(repo, number, target, due_date, days_late):
     print(f"reminded @{target} on issue #{number}")
 
 
-def move_status(project_id, item_id, field_id, option_id):
+def move_status(project_id, item_id, field_id, option_id, option_name):
     query = (
         "mutation {"
         "updateProjectV2ItemFieldValue(input: {"
@@ -83,7 +83,7 @@ def move_status(project_id, item_id, field_id, option_id):
         "}"
     )
     gql(query)
-    print(f"moved item {item_id} to Working")
+    print(f"moved item {item_id} to {option_name}")
 
 
 def main():
@@ -130,7 +130,7 @@ query {{
             nodes {{
               ... on ProjectV2ItemFieldSingleSelectValue {{
                 name
-                field {{ ... on ProjectV2Field {{ name }} }}
+                field {{ ... on ProjectV2SingleSelectField {{ name }} }}
               }}
               ... on ProjectV2ItemFieldDateValue {{
                 date
@@ -148,7 +148,7 @@ query {{
     project_node = data["node"]
     status_field = project_node.get("statusField") or {}
     options = {opt["name"]: opt["id"] for opt in status_field.get("options", [])}
-    working_option = options.get("Working")
+    todo_option = options.get("ToDo")
     status_field_id = status_field.get("id")
 
     today = date.today()
@@ -168,8 +168,8 @@ query {{
         if due is None:
             continue
         due_date = date.fromisoformat(due)
-        if status == "Snoozed" and due_date <= today and working_option and status_field_id:
-            move_status(project_id, item["id"], status_field_id, working_option)
+        if status == "Snoozed" and due_date <= today and todo_option and status_field_id:
+            move_status(project_id, item["id"], status_field_id, todo_option, "ToDo")
         if status == "Done":
             continue
         days_late = (today - due_date).days

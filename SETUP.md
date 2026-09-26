@@ -37,6 +37,12 @@ gh project create --owner <owner> --title "Collaborative Planning" --format json
 
 Write down `number` (e.g. `2`) and `id` (starts with `PVT_`).
 
+If the project should be visible to everyone (recommended for a public repo), make it public:
+
+```bash
+gh project edit <number> --owner <owner> --visibility PUBLIC
+```
+
 ## 2. Configure the fields
 
 ### Status
@@ -87,6 +93,8 @@ env:
 
 Adjust the other defaults if needed: `DEFAULT_ASSIGNEE`, `OVERDUE_DAYS`, and the cron time (GitHub cron is UTC: `0 15 * * *` = 08:00 Pacific in daylight saving time, `0 16 * * *` in standard time).
 
+Behavior: the workflow moves an issue from `Snoozed` to `ToDo` on its due date, and sends a reminder at most once per due date (a week after it is missed). No repeated pinging.
+
 ## 4. Store the token as a secret
 
 ```bash
@@ -102,7 +110,7 @@ gh workflow run reminders.yml --repo <owner>/<repo>
 gh run watch --repo <owner>/<repo>
 ```
 
-Expected: the run succeeds and prints nothing (or a list of moved items). A quick end-to-end check: create a test issue, set its `Due date` to today and `Status` to `Snoozed` on the board — the next run should move it to `Working`.
+Expected: the run succeeds and prints nothing (or a list of moved items). A quick end-to-end check: create a test issue, set its `Due date` to today and `Status` to `Snoozed` on the board — the next run should move it to `ToDo`.
 
 ## 6. Automation rules (browser only)
 

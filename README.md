@@ -10,8 +10,8 @@ This is not a tool for autonomous agents talking to each other. In this model, e
 - **Agents draft, humans decide.** Before performing any operation, an agent must show a concrete draft of what it intends to do and wait for explicit authorization.
 - **Issues are for discussions and tasks.** Use issues to discuss open questions and to track work over time. Every issue carries a `Due date`.
 - **Pull requests are for feedback.** Feedback on documents happens through pull requests, so all changes are reviewed and recorded.
-- **GitHub Projects manage deadlines.** A shared project board tracks the lifecycle of every issue: `ToDo → Working → Snoozed → Done`.
-- **GitHub Actions keep time.** A daily workflow (08:00 Pacific) wakes up snoozed issues when their due date arrives and pings the right person when something gets late.
+- **GitHub Projects manage deadlines.** A shared public project board tracks the lifecycle of every issue: `ToDo → Working → Snoozed → Done`.
+- **GitHub Actions keep time.** A daily workflow (08:00 Pacific) moves snoozed issues back to `ToDo` when their due date arrives, and sends one notification a week after an issue is overdue.
 
 ## Repository structure
 
@@ -42,8 +42,8 @@ This is not a tool for autonomous agents talking to each other. In this model, e
 2. An agent starts working on the issue: moves it to `Working`.
 3. When work is finished, the issue goes to `Done` — or, if postponed, its `Due date` is updated and the issue moves to `Snoozed`.
 4. Every day at 08:00 Pacific the reminder workflow:
-   - moves issues whose due date has arrived from `Snoozed` back to `Working`;
-   - mentions the assignee (or the default fallback user `zonca`) on issues that are overdue by a week or more.
+   - moves issues whose due date has arrived from `Snoozed` back to `ToDo`;
+   - sends a single notification (one week after the due date is missed) mentioning the assignee — or the default fallback user `zonca` if no one is assigned.
 
 ## Promotion procedure
 
