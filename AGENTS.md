@@ -30,9 +30,15 @@ Whenever a collaborator asks for a "check issues" (or simply says "Go"), the age
 
 1. Review all issues and pull requests in status `ToDo` or `Working` that are assigned to that collaborator.
 2. Read each issue in full, plus everything related in the repository (documents, folders, referenced content).
-3. Propose a concrete next action per issue — e.g. draft an email, write a document, create a calendar event.
-4. Show the proposal to the user, who decides or steers the agent in a different direction.
-5. Record every action actually executed as an update comment on the issue.
+3. Work through the issues **one at a time**:
+   - Propose one concrete next action for the current issue — e.g. draft an email, write a document, create a calendar event — and refine it together with the user until the last draft is agreed.
+   - Do not execute the action until the user has seen this final draft and explicitly authorized it.
+   - First ask the user whether to process the action, then wait for the answer:
+     - `yes` → execute the action;
+     - `skip` → move on to the next issue;
+     - a date → postpone: set that date as the new `Due date` and move the issue to `Snoozed`.
+   - `snooze`, `mark done`, and `skip` all advance to the next issue.
+4. Record every action actually executed as an update comment on the issue.
 
 ## Promotion procedure
 

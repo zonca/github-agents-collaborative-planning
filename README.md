@@ -49,7 +49,7 @@ This is not a tool for autonomous agents talking to each other. In this model, e
 
 Each collaborator works with their own agent, which is connected to the whole repository. The agent reads the relevant documents and knows the current state of the project, so it can propose next steps in concrete form — but every action needs the human's approval.
 
-A typical session starts with **"check issues"** (or simply **"Go"**): the agent reviews the issues and pull requests in `ToDo`/`Working` state assigned to that collaborator, reads the related content in the repository, and proposes one concrete next action per issue — draft an email, write a document, schedule an event, and so on. The human picks, corrects, or redirects. Whatever is actually executed is recorded as an update on the issue, so the project history stays in the repository.
+A typical session starts with **"check issues"** (or simply **"Go"**): the agent reviews the issues and pull requests in `ToDo`/`Working` state assigned to that collaborator, reads the related content in the repository, and works through them **one at a time** — proposing one concrete next action per issue (draft an email, write a document, schedule an event, and so on) and refining it until the draft is final. Nothing is executed before the human has seen the final draft; the agent then asks whether to process it, and waits for `yes` (execute), `skip` (next issue), or a date (postpone to a new due date). Whatever is actually executed is recorded as an update on the issue, so the project history stays in the repository.
 
 ## Promotion procedure
 
