@@ -2,6 +2,27 @@
 
 General guidelines for every AI agent working in this repository. This file is intentionally lightweight: it mostly points to where the actual content and instructions live.
 
+## ⚠️ ABSOLUTE PREREQUISITE — READ THE CUSTOM AGENTS FILE FIRST (MANDATORY)
+
+> **BEFORE ANY ACTION OF ANY KIND**, read the user-specific agent file
+> `user_agent/AGENTS_<github-username>.md` (keyed to the active GitHub user, e.g.
+> `user_agent/AGENTS_zonca.md` for user **zonca**).
+
+This is the **first and highest-priority requirement** of this repository, and it
+**supersedes everything else in this file** until the custom file has been read.
+
+- **No action may be taken** — not reading a file, not editing, not running a
+  command, not commenting, not moving a card — until the custom agent file has been
+  read and its instructions are **in effect**.
+- This is a **strict precondition of every operation, at every moment of the
+  session** — not just at startup. If you reach any point where the custom file has
+  not yet been loaded, **stop and load it immediately** before proceeding.
+- If the custom agent file's instructions conflict with anything in this generic
+  file, the **custom file wins**.
+- There is **no exception** and **no skipping** this step. An agent that acts
+  without first reading the custom agent file is acting in violation of the
+  repository's rules.
+
 ## What an agent is
 
 Agents assist their human collaborator. There are no autonomous agents here: every meaningful operation requires explicit authorization from the user.
@@ -49,6 +70,14 @@ When in-progress work tracked by an issue is finalized, the agent must propose p
 - General guidelines that apply to all users → this file. Keep it light: mostly pointers, no big content.
 - Personal settings, contacts, and preferences → `user_agent/AGENTS_<github-username>.md`.
 - Setup instructions (project board, token, reminders) → `SETUP.md`.
+
+## User-specific AGENTS file (mandatory)
+
+Before executing ANY action on this repository, the agent MUST load the user-specific file `user_agent/AGENTS_<github-username>.md` keyed to the active GitHub user (e.g. `user_agent/AGENTS_zonca.md` for user **zonca**). No action may be taken until that file has been read and its instructions are in effect. This is a precondition of every operation, not only at session start: if it has not yet been loaded, load it first.
+
+## Reading order at startup
+
+At session start, read BOTH this file AND the matching `user_agent/AGENTS_<github-username>.md` (the personal file beyond this generic one, keyed to the active GitHub user) before acting on the repository. `user_agent/AGENTS_zonca.md` applies to user **zonca**; it is not auto-loaded otherwise.
 
 ## Defaults
 
